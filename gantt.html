@@ -210,25 +210,25 @@ body.connecting * { cursor:inherit !important; }
 
   <!-- Gantt-only controls (hidden on stats page) -->
   <span id="gantt-tb" style="display:contents">
-    <button class="btn" onclick="openAdd(null,'goal')" style="border-color:#a78bfa;color:#7c3aed">＋ 新增目標</button>
-    <button class="btn pri" onclick="openAdd(null,'project')">＋ 新增專案</button>
-    <button class="btn" onclick="openAdd(null,'task')">＋ 新增任務</button>
+    <button class="btn" id="btn-add-goal" onclick="openAdd(null,'goal')" style="border-color:#a78bfa;color:#7c3aed">＋ 新增目標</button>
+    <button class="btn pri" id="btn-add-project" onclick="openAdd(null,'project')">＋ 新增專案</button>
+    <button class="btn" id="btn-add-task" onclick="openAdd(null,'task')">＋ 新增任務</button>
     <div class="sep"></div>
-    <button class="btn act" id="btn-cp" onclick="toggleCP()">⚡ 關鍵路徑</button>
-    <button class="btn act" id="btn-bl" onclick="toggleBL()">📐 基準線</button>
-    <button class="btn" onclick="saveBaseline()">💾 儲存基準線</button>
+    <button class="btn act" id="btn-cp" onclick="toggleCP()">⚡ <span id="lbl-cp">關鍵路徑</span></button>
+    <button class="btn act" id="btn-bl" onclick="toggleBL()">📐 <span id="lbl-bl">基準線</span></button>
+    <button class="btn" onclick="saveBaseline()">💾 <span id="lbl-save-bl">儲存基準線</span></button>
     <div class="sep"></div>
     <div class="vsel">
-      <button class="vbtn" id="vd" onclick="setView('day')">日</button>
-      <button class="vbtn act" id="vw" onclick="setView('week')">週</button>
-      <button class="vbtn" id="vm" onclick="setView('month')">月</button>
+      <button class="vbtn" id="vd" onclick="setView('day')" data-i18n="day">日</button>
+      <button class="vbtn act" id="vw" onclick="setView('week')" data-i18n="week">週</button>
+      <button class="vbtn" id="vm" onclick="setView('month')" data-i18n="month">月</button>
     </div>
     <div class="sep"></div>
     <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px;white-space:nowrap">
-      到期警示 <input type="number" id="wdays" value="3" min="1" max="30" style="width:44px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:12px;" onchange="render()"> 天內
+      <span id="lbl-warn-prefix">到期警示</span> <input type="number" id="wdays" value="3" min="1" max="30" style="width:44px;padding:3px 6px;border:1px solid var(--border);border-radius:5px;font-size:12px;" onchange="render()"> <span id="lbl-warn-suffix">天內</span>
     </label>
     <div class="sep"></div>
-    <button class="btn" onclick="scrollToday()">⦿ 今天</button>
+    <button class="btn" id="btn-today" onclick="scrollToday()">⦿ <span id="lbl-today">今天</span></button>
     <div class="sep"></div>
     <select id="filter-sel" onchange="filterAssignee=this.value;render()" style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text);background:#fff;cursor:pointer;max-width:130px">
       <option value="">👤 全部成員</option>
@@ -236,8 +236,10 @@ body.connecting * { cursor:inherit !important; }
   </span>
   <div class="sp"></div>
   <div class="sep"></div>
-  <button class="btn" onclick="exportData()" title="匯出備份 JSON">⬇ 匯出</button>
-  <button class="btn" onclick="importData()" title="從 JSON 匯入">⬆ 匯入</button>
+  <button class="btn" id="btn-export" onclick="exportData()" title="匯出備份 JSON">⬇ <span id="lbl-export">匯出</span></button>
+  <button class="btn" id="btn-import" onclick="importData()" title="從 JSON 匯入">⬆ <span id="lbl-import">匯入</span></button>
+  <div class="sep"></div>
+  <button class="btn" id="btn-lang" onclick="toggleLang()" style="font-weight:700;min-width:42px">EN</button>
 </div>
 
 <!-- App body: sidenav + pages -->
@@ -247,20 +249,20 @@ body.connecting * { cursor:inherit !important; }
   <div id="sidenav">
     <button class="nitem act" id="nav-gantt" onclick="showPage('gantt')" title="甘特圖">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="14" x2="14" y2="14"/><line x1="7" y1="18" x2="11" y2="18"/></svg>
-      甘特圖
+      <span id="nav-lbl-gantt">甘特圖</span>
     </button>
     <button class="nitem" id="nav-stats" onclick="showPage('stats')" title="統計">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
-      統計
+      <span id="nav-lbl-stats">統計</span>
     </button>
     <button class="nitem" id="nav-team" onclick="showPage('team')" title="團隊">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
-      團隊
+      <span id="nav-lbl-team">團隊</span>
     </button>
     <div class="ndivider"></div>
     <button class="nitem" id="nav-overdue" onclick="showPage('overdue')" title="逾期警示" style="position:relative">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      逾期
+      <span id="nav-lbl-overdue">逾期</span>
     </button>
   </div>
 
@@ -268,7 +270,7 @@ body.connecting * { cursor:inherit !important; }
   <div id="page-gantt">
     <div id="tpanel">
       <div id="tphdr" style="justify-content:space-between">
-        <span>專案 / 任務</span><span style="font-size:10px;letter-spacing:.04em">進度</span>
+        <span id="lbl-col-task">專案 / 任務</span><span id="lbl-col-prog" style="font-size:10px;letter-spacing:.04em">進度</span>
       </div>
       <div id="tbscroll"><div id="tlist"></div></div>
     </div>
@@ -291,8 +293,8 @@ body.connecting * { cursor:inherit !important; }
   <!-- Team page -->
   <div id="page-team">
     <div class="team-toolbar">
-      <div class="stats-section-title" style="margin-bottom:0">團隊成員</div>
-      <button class="btn pri" onclick="openAddMember()">＋ 新增成員</button>
+      <div class="stats-section-title" style="margin-bottom:0" id="lbl-team-members">團隊成員</div>
+      <button class="btn pri" id="btn-add-member" onclick="openAddMember()">＋ <span id="lbl-add-member">新增成員</span></button>
     </div>
     <div class="team-grid" id="team-grid"></div>
   </div>
@@ -305,16 +307,16 @@ body.connecting * { cursor:inherit !important; }
   <span class="si"><span class="sd" style="background:var(--success)"></span><span id="st1"></span></span>
   <span class="si"><span class="sd" style="background:var(--critical)"></span><span id="st2"></span></span>
   <span class="si"><span class="sd" style="background:var(--warning)"></span><span id="st3"></span></span>
-  <span style="margin-left:auto;font-size:11px;color:var(--text2)" id="sbar-hint">拖動條形移動 · 右緣縮放 · 右端圓點拖出相依 · N新增任務 · Del刪除</span>
+  <span style="margin-left:auto;font-size:11px;color:var(--text2)" id="sbar-hint">拖動條形移動 · 右緣縮放 · 右端圓點拖出相依 · N 新增任務 · Del 刪除</span>
 </div>
 
 <div id="leg">
-  <div class="li"><div class="ld" style="background:var(--primary)"></div>一般</div>
-  <div class="li"><div class="ld" style="background:var(--critical)"></div>關鍵路徑</div>
-  <div class="li"><div class="ld" style="background:var(--warning)"></div>即將到期</div>
-  <div class="li"><div class="ld" style="background:#dc2626"></div>逾期</div>
-  <div class="li"><div class="ld" style="background:var(--success)"></div>完成</div>
-  <div class="li"><svg width="22" height="10"><rect x="0" y="3" width="22" height="4" fill="#94a3b8" rx="2" opacity=".55"/></svg>基準線</div>
+  <div class="li"><div class="ld" style="background:var(--primary)"></div><span id="leg-normal">一般</span></div>
+  <div class="li"><div class="ld" style="background:var(--critical)"></div><span id="leg-cp">關鍵路徑</span></div>
+  <div class="li"><div class="ld" style="background:var(--warning)"></div><span id="leg-warn">即將到期</span></div>
+  <div class="li"><div class="ld" style="background:#dc2626"></div><span id="leg-over">逾期</span></div>
+  <div class="li"><div class="ld" style="background:var(--success)"></div><span id="leg-done">完成</span></div>
+  <div class="li"><svg width="22" height="10"><rect x="0" y="3" width="22" height="4" fill="#94a3b8" rx="2" opacity=".55"/></svg><span id="leg-bl">基準線</span></div>
 </div>
 <div id="tt"></div>
 <div id="drag-hint"></div>
@@ -325,41 +327,41 @@ body.connecting * { cursor:inherit !important; }
     <div class="mttl" id="mttl">新增</div>
     <input type="hidden" id="eid">
     <div class="fg">
-      <label class="fl">類型</label>
+      <label class="fl" id="lbl-type">類型</label>
       <div class="type-seg">
-        <button class="type-opt" id="tp-goal" onclick="setModalType('goal')">🎯 目標</button>
-        <button class="type-opt" id="tp-project" onclick="setModalType('project')">📁 專案</button>
-        <button class="type-opt act" id="tp-task" onclick="setModalType('task')">📋 任務</button>
-        <button class="type-opt" id="tp-milestone" onclick="setModalType('milestone')">◆ 里程碑</button>
+        <button class="type-opt" id="tp-goal" onclick="setModalType('goal')">🎯 <span id="lbl-tp-goal">目標</span></button>
+        <button class="type-opt" id="tp-project" onclick="setModalType('project')">📁 <span id="lbl-tp-project">專案</span></button>
+        <button class="type-opt act" id="tp-task" onclick="setModalType('task')">📋 <span id="lbl-tp-task">任務</span></button>
+        <button class="type-opt" id="tp-milestone" onclick="setModalType('milestone')">◆ <span id="lbl-tp-milestone">里程碑</span></button>
       </div>
     </div>
     <div class="fg" id="fparent-row"><label class="fl" id="fparent-label">父層專案</label><select class="fi" id="fparent"></select></div>
-    <div class="fg"><label class="fl">名稱</label><input class="fi" id="fn" placeholder="輸入名稱…"></div>
+    <div class="fg"><label class="fl" id="lbl-name">名稱</label><input class="fi" id="fn" placeholder="輸入名稱…"></div>
     <div class="fg" id="assignee-field">
-      <label class="fl">負責人</label>
+      <label class="fl" id="lbl-assignee">負責人</label>
       <select class="fi" id="fassignee"></select>
     </div>
     <div id="task-fields">
       <div class="fr">
-        <div class="fg"><label class="fl">開始日期</label><input class="fi" id="fs" type="date" oninput="syncEnd()"></div>
-        <div class="fg"><label class="fl">結束日期</label><input class="fi" id="fe" type="date" oninput="syncDur()"></div>
+        <div class="fg"><label class="fl" id="lbl-start">開始日期</label><input class="fi" id="fs" type="date" oninput="syncEnd()"></div>
+        <div class="fg"><label class="fl" id="lbl-end">結束日期</label><input class="fi" id="fe" type="date" oninput="syncDur()"></div>
       </div>
       <div class="fr">
-        <div class="fg"><label class="fl">工期（天）</label><input class="fi" id="fd" type="number" min="1" value="5" oninput="syncEnd()"></div>
+        <div class="fg"><label class="fl" id="lbl-dur">工期（天）</label><input class="fi" id="fd" type="number" min="1" value="5" oninput="syncEnd()"></div>
         <div class="fg">
-          <label class="fl">完成度 <span id="pv">0</span>%</label>
+          <label class="fl" id="lbl-prog">完成度 <span id="pv">0</span>%</label>
           <input class="fi" id="fp" type="range" min="0" max="100" value="0" style="padding:4px 0" oninput="document.getElementById('pv').textContent=this.value">
         </div>
       </div>
-      <div class="fg"><label class="fl">前置任務 ID（逗號分隔）</label><input class="fi" id="fdeps" placeholder="例：2, 3"></div>
+      <div class="fg"><label class="fl" id="lbl-deps">前置任務 ID（逗號分隔）</label><input class="fi" id="fdeps" placeholder="例：2, 3"></div>
     </div>
     <div class="fg">
       <label class="fl">顏色</label>
       <div id="cpick" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:2px"></div>
     </div>
     <div class="mact">
-      <button class="btn" onclick="closeModal()">取消</button>
-      <button class="btn pri" onclick="saveTask()">儲存</button>
+      <button class="btn" id="lbl-modal-cancel" onclick="closeModal()">取消</button>
+      <button class="btn pri" id="lbl-modal-save" onclick="saveTask()">儲存</button>
     </div>
   </div>
 </div>
@@ -369,17 +371,281 @@ body.connecting * { cursor:inherit !important; }
   <div class="modal" style="width:420px">
     <div class="mttl" id="mm-title">新增成員</div>
     <input type="hidden" id="mm-eid">
-    <div class="fg"><label class="fl">姓名</label><input class="fi" id="mm-name" placeholder="例：王小明"></div>
+    <div class="fg"><label class="fl" id="lbl-mm-name">姓名</label><input class="fi" id="mm-name" placeholder="例：王小明"></div>
     <div class="fg"><label class="fl">Email</label><input class="fi" id="mm-email" type="email" placeholder="例：wang@company.com"></div>
-    <div class="fg"><label class="fl">負責線別</label><input class="fi" id="mm-line" placeholder="例：前端開發、行動應用…"></div>
+    <div class="fg"><label class="fl" id="lbl-mm-line">負責線別</label><input class="fi" id="mm-line" placeholder="例：前端開發、行動應用…"></div>
     <div class="mact">
-      <button class="btn" onclick="closeMemberModal()">取消</button>
-      <button class="btn pri" onclick="saveMember()">儲存</button>
+      <button class="btn" id="lbl-mm-cancel" onclick="closeMemberModal()">取消</button>
+      <button class="btn pri" id="lbl-mm-save" onclick="saveMember()">儲存</button>
     </div>
   </div>
 </div>
 
 <script>
+// ── i18n ─────────────────────────────────────────────────────────────
+let lang='zh';
+const T={
+  zh:{
+    addGoal:'＋ 新增目標', addProject:'＋ 新增專案', addTask:'＋ 新增任務',
+    cp:'關鍵路徑', bl:'基準線', saveBl:'儲存基準線',
+    day:'日', week:'週', month:'月',
+    warnPrefix:'到期警示', warnSuffix:'天內',
+    today:'今天', export:'匯出', import:'匯入',
+    navGantt:'甘特圖', navStats:'統計', navTeam:'團隊', navOverdue:'逾期',
+    colTask:'專案 / 任務', colProg:'進度',
+    teamMembers:'團隊成員', addMember:'新增成員',
+    sbarHint:'拖動條形移動 · 右緣縮放 · 右端圓點拖出相依 · N 新增任務 · Del 刪除',
+    legNormal:'一般', legCp:'關鍵路徑', legWarn:'即將到期', legOver:'逾期', legDone:'完成', legBl:'基準線',
+    modalType:'類型', tpGoal:'目標', tpProject:'專案', tpTask:'任務', tpMilestone:'里程碑',
+    parentLabel:'父層專案', parentGoalLabel:'所屬目標',
+    name:'名稱', assignee:'負責人', startDate:'開始日期', endDate:'結束日期',
+    dur:'工期（天）', prog:'完成度', deps:'前置任務 ID（逗號分隔）',
+    cancel:'取消', save:'儲存',
+    mmName:'姓名', mmLine:'負責線別',
+    mmTitleAdd:'新增成員', mmTitleEdit:'編輯成員',
+    modalTitleAdd:'新增', modalTitleEdit:'編輯',
+    // status pills
+    stDone:'已完成', stOver:'逾期', stWarn:'即將到期', stAhead:'超前', stOk:'如期',
+    // status bar
+    stbarProjects:(p,t)=>`${p} 個專案 / ${t} 個任務`,
+    stbarDone:(n)=>`完成 ${n}`,
+    stbarCp:(n)=>`關鍵路徑 ${n} 個`,
+    stbarWarn:(d,n)=>`${d}天內到期 ${n} 個`,
+    // stat cards
+    scActiveProj:'進行中專案', scTotalTask:'總任務數', scOverallPct:'整體完成度',
+    scDone:'已完成任務', scInProg:'進行中任務', scOverdue:'逾期任務', scAhead:'超前進度任務',
+    // stats page
+    projProgress:'專案進度',
+    snapshotLabel:(date,week)=>`對比基準：${date}（第 ${week} 週）`,
+    snapshotNone:'尚未設定，點右側按鈕建立第一筆基準',
+    recordSnapshot:'📸 記錄本周基準',
+    statFlat:'→ 持平',
+    // pills
+    pillDone:(n)=>`✓ 完成 ${n}`, pillProg:(n)=>`▶ 進行中 ${n}`,
+    pillAhead:(n)=>`⚡ 超前進度 ${n}`, pillWarn:(n)=>`⏰ 即將到期 ${n}`,
+    pillOver:(n)=>`⚠ 逾期 ${n}`, pillNoTask:'尚無任務',
+    moreTask:(n)=>`… 另 ${n} 個任務`,
+    projDone:(a,b)=>`${a}/${b} 完成`,
+    // workload
+    allDone:'✓ 所有任務已完成',
+    // team page
+    noMembers:'尚無成員，請點擊右上角「＋ 新增成員」。',
+    selectAssignee:'— 請選擇負責人 —',
+    noAssignee:'未指定負責人',
+    // overdue page
+    overdueEmpty:'✅ 目前無逾期任務，所有專案如期進行',
+    overdueTitle:(total,people)=>`⚠ 逾期任務 — 共 ${total} 個，影響 ${people} 位成員`,
+    emailNone:'尚未設定 Email — 請至團隊頁面補填',
+    emailNoTitle:'請先至團隊頁面設定此人的 Email',
+    daysLate:(n)=>`逾期 ${n} 天`,
+    progLabel:(n)=>`進度 ${n}%`,
+    origDate:(d)=>`原定 ${d}`,
+    // overdue email
+    emailSubject:(n)=>`【進度提醒】您有 ${n} 個任務已逾期，請更新進度`,
+    emailLine1:(name)=>`${name} 您好，`,
+    emailLine2:'以下任務已超過預定完成日期，請儘快更新進度或提出 Catch-up Plan：',
+    emailItem:(proj,name,end,days,pct)=>`・${proj?`[${proj}] `:''}${name}\n  原定完成：${end}（已逾期 ${days} 天）\n  目前進度：${pct}%`,
+    emailQ1:'1. 目前最新進度', emailQ2:'2. 預計完成日期',
+    emailQ3:'3. 如有延誤原因或需要支援，請一併說明',
+    // tooltips
+    ttPeriod:(s,e)=>`期間：${s} ～ ${e}`,
+    ttDur:(d)=>`總工期：${d} 天`,
+    ttOvProg:(p)=>`整體進度：${p}%`,
+    ttProjCount:(n)=>`專案數：${n}`,
+    ttProg:(p)=>`進度：${p}%`,
+    ttStart:(d)=>`開始：${d}`,
+    ttEnd:(d)=>`結束：${d}`,
+    ttDurTask:(d)=>`工期：${d} 天`,
+    ttCrit:'⚡ 關鍵路徑',
+    ttDone:'✅ 已完成', ttOver:(d)=>`⚠️ 逾期 ${d} 天`,
+    ttWarn:(d)=>`⏰ 還剩 ${d} 天`, ttOk:(d)=>`📅 還剩 ${d} 天`,
+    ttGoalDone:'✅ 已完成', ttGoalOver:'⚠️ 有任務逾期',
+    ttGoalWarn:'⏰ 有任務即將到期', ttGoalOk:'📋 進行中',
+    // flash / hints
+    flashMoved:'✓ 已移動',
+    flashSavedBl:'基準線已儲存 ✓',
+    flashSnap:'本周進度基準已記錄 ✓',
+    flashBackup:'備份已下載 ✓',
+    flashImport:'資料匯入成功 ✓',
+    flashCycle:'⚠️ 無法建立：會造成循環相依',
+    flashDepRemoved:(from,to)=>`已移除相依：${from} → ${to}`,
+    hintMove:(name)=>`拖動中：${name}`,
+    hintResize:(name)=>`調整工期：${name}`,
+    // misc
+    noName:'請輸入名稱', noMemberName:'請填寫姓名',
+    confirmDeleteMember:(name)=>`確定刪除「${name}」？`,
+    confirmDeleteTask:(name,n)=>n?`確定刪除「${name}」及所有子項目（共 ${n} 個）？`:`確定刪除「${name}」？`,
+    badFile:'檔案格式錯誤，請選擇由本程式匯出的 JSON 檔',
+    parentNone:'（獨立專案，無目標）', parentNoneTask:'（頂層，無父層）',
+  },
+  en:{
+    addGoal:'＋ Add Goal', addProject:'＋ Add Project', addTask:'＋ Add Task',
+    cp:'Critical Path', bl:'Baseline', saveBl:'Save Baseline',
+    day:'Day', week:'Week', month:'Month',
+    warnPrefix:'Due alert', warnSuffix:'days',
+    today:'Today', export:'Export', import:'Import',
+    navGantt:'Gantt', navStats:'Stats', navTeam:'Team', navOverdue:'Overdue',
+    colTask:'Project / Task', colProg:'Progress',
+    teamMembers:'Team Members', addMember:'Add Member',
+    sbarHint:'Drag bar to move · Right edge to resize · Right dot to link · N add task · Del delete',
+    legNormal:'Normal', legCp:'Critical Path', legWarn:'Due Soon', legOver:'Overdue', legDone:'Done', legBl:'Baseline',
+    modalType:'Type', tpGoal:'Goal', tpProject:'Project', tpTask:'Task', tpMilestone:'Milestone',
+    parentLabel:'Parent Project', parentGoalLabel:'Parent Goal',
+    name:'Name', assignee:'Assignee', startDate:'Start Date', endDate:'End Date',
+    dur:'Duration (days)', prog:'Progress%', deps:'Predecessor IDs (comma-separated)',
+    cancel:'Cancel', save:'Save',
+    mmName:'Name', mmLine:'Role / Team',
+    mmTitleAdd:'Add Member', mmTitleEdit:'Edit Member',
+    modalTitleAdd:'Add', modalTitleEdit:'Edit',
+    // status pills
+    stDone:'Done', stOver:'Overdue', stWarn:'Due Soon', stAhead:'Ahead', stOk:'On Track',
+    // status bar
+    stbarProjects:(p,t)=>`${p} projects / ${t} tasks`,
+    stbarDone:(n)=>`Done ${n}`,
+    stbarCp:(n)=>`Critical ${n}`,
+    stbarWarn:(d,n)=>`Due in ${d}d: ${n}`,
+    // stat cards
+    scActiveProj:'Active Projects', scTotalTask:'Total Tasks', scOverallPct:'Overall Progress',
+    scDone:'Completed', scInProg:'In Progress', scOverdue:'Overdue', scAhead:'Ahead of Schedule',
+    // stats page
+    projProgress:'Project Progress',
+    snapshotLabel:(date,week)=>`Baseline: ${date} (Week ${week})`,
+    snapshotNone:'Not set — click the button to create the first snapshot',
+    recordSnapshot:'📸 Record This Week',
+    statFlat:'→ flat',
+    // pills
+    pillDone:(n)=>`✓ Done ${n}`, pillProg:(n)=>`▶ In Progress ${n}`,
+    pillAhead:(n)=>`⚡ Ahead ${n}`, pillWarn:(n)=>`⏰ Due Soon ${n}`,
+    pillOver:(n)=>`⚠ Overdue ${n}`, pillNoTask:'No tasks yet',
+    moreTask:(n)=>`… ${n} more tasks`,
+    projDone:(a,b)=>`${a}/${b} done`,
+    // workload
+    allDone:'✓ All tasks complete',
+    // team page
+    noMembers:'No members yet — click "+ Add Member" in the top right.',
+    selectAssignee:'— Select Assignee —',
+    noAssignee:'No assignee',
+    // overdue page
+    overdueEmpty:'✅ No overdue tasks — all projects on track',
+    overdueTitle:(total,people)=>`⚠ Overdue Tasks — ${total} total, affecting ${people} members`,
+    emailNone:'Email not set — please update in Team page',
+    emailNoTitle:'Please set this person\'s Email in the Team page first',
+    daysLate:(n)=>`${n} days late`,
+    progLabel:(n)=>`Progress ${n}%`,
+    origDate:(d)=>`Due ${d}`,
+    // overdue email
+    emailSubject:(n)=>`[Progress Reminder] You have ${n} overdue tasks — please update`,
+    emailLine1:(name)=>`Hi ${name},`,
+    emailLine2:'The following tasks are past their due date. Please update your progress or submit a catch-up plan:',
+    emailItem:(proj,name,end,days,pct)=>`・${proj?`[${proj}] `:''}${name}\n  Original due: ${end} (${days} days overdue)\n  Current progress: ${pct}%`,
+    emailQ1:'1. Current progress update', emailQ2:'2. Revised completion date',
+    emailQ3:'3. Reason for delay or support needed (if any)',
+    // tooltips
+    ttPeriod:(s,e)=>`Period: ${s} – ${e}`,
+    ttDur:(d)=>`Duration: ${d} days`,
+    ttOvProg:(p)=>`Overall: ${p}%`,
+    ttProjCount:(n)=>`Projects: ${n}`,
+    ttProg:(p)=>`Progress: ${p}%`,
+    ttStart:(d)=>`Start: ${d}`,
+    ttEnd:(d)=>`End: ${d}`,
+    ttDurTask:(d)=>`Duration: ${d} days`,
+    ttCrit:'⚡ Critical Path',
+    ttDone:'✅ Done', ttOver:(d)=>`⚠️ ${d} days overdue`,
+    ttWarn:(d)=>`⏰ ${d} days left`, ttOk:(d)=>`📅 ${d} days left`,
+    ttGoalDone:'✅ Done', ttGoalOver:'⚠️ Some tasks overdue',
+    ttGoalWarn:'⏰ Some tasks due soon', ttGoalOk:'📋 In Progress',
+    // flash / hints
+    flashMoved:'✓ Moved',
+    flashSavedBl:'Baseline saved ✓',
+    flashSnap:'Weekly baseline recorded ✓',
+    flashBackup:'Backup downloaded ✓',
+    flashImport:'Data imported ✓',
+    flashCycle:'⚠️ Cannot create: would cause a circular dependency',
+    flashDepRemoved:(from,to)=>`Removed dependency: ${from} → ${to}`,
+    hintMove:(name)=>`Moving: ${name}`,
+    hintResize:(name)=>`Resizing: ${name}`,
+    // misc
+    noName:'Please enter a name', noMemberName:'Please enter a name',
+    confirmDeleteMember:(name)=>`Delete "${name}"?`,
+    confirmDeleteTask:(name,n)=>n?`Delete "${name}" and all ${n} children?`:`Delete "${name}"?`,
+    badFile:'Invalid file format — please select a JSON file exported by this app',
+    parentNone:'(Standalone project, no goal)', parentNoneTask:'(Top level, no parent)',
+  }
+};
+function setLang(l){
+  lang=l;
+  const t=T[l];
+  const isEn=l==='en';
+  // Toggle button label
+  const btn=document.getElementById('btn-lang');
+  if(btn)btn.textContent=isEn?'中文':'EN';
+  // html lang attr
+  document.documentElement.lang=isEn?'en':'zh-TW';
+  // Toolbar
+  const ag=document.getElementById('btn-add-goal');if(ag)ag.innerHTML=t.addGoal;
+  const ap=document.getElementById('btn-add-project');if(ap)ap.innerHTML=t.addProject;
+  const at=document.getElementById('btn-add-task');if(at)at.innerHTML=t.addTask;
+  const lcp=document.getElementById('lbl-cp');if(lcp)lcp.textContent=t.cp;
+  const lbl=document.getElementById('lbl-bl');if(lbl)lbl.textContent=t.bl;
+  const lsbl=document.getElementById('lbl-save-bl');if(lsbl)lsbl.textContent=t.saveBl;
+  ['day','week','month'].forEach(v=>{const b=document.getElementById('v'+v[0]);if(b)b.setAttribute('data-i18n',v);});
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k])el.textContent=t[k];});
+  const wp=document.getElementById('lbl-warn-prefix');if(wp)wp.textContent=t.warnPrefix;
+  const ws=document.getElementById('lbl-warn-suffix');if(ws)ws.textContent=t.warnSuffix;
+  const td=document.getElementById('lbl-today');if(td)td.textContent=t.today;
+  const ex=document.getElementById('lbl-export');if(ex)ex.textContent=t.export;
+  const im=document.getElementById('lbl-import');if(im)im.textContent=t.import;
+  // Nav
+  const ng=document.getElementById('nav-lbl-gantt');if(ng)ng.textContent=t.navGantt;
+  const ns=document.getElementById('nav-lbl-stats');if(ns)ns.textContent=t.navStats;
+  const nt=document.getElementById('nav-lbl-team');if(nt)nt.textContent=t.navTeam;
+  const no=document.getElementById('nav-lbl-overdue');if(no)no.textContent=t.navOverdue;
+  // Panel header
+  const ct=document.getElementById('lbl-col-task');if(ct)ct.textContent=t.colTask;
+  const cp2=document.getElementById('lbl-col-prog');if(cp2)cp2.textContent=t.colProg;
+  // Team toolbar
+  const tm=document.getElementById('lbl-team-members');if(tm)tm.textContent=t.teamMembers;
+  const am=document.getElementById('lbl-add-member');if(am)am.textContent=t.addMember;
+  // Status bar hint
+  const sh=document.getElementById('sbar-hint');if(sh)sh.textContent=t.sbarHint;
+  // Legend
+  const ln=document.getElementById('leg-normal');if(ln)ln.textContent=t.legNormal;
+  const lc=document.getElementById('leg-cp');if(lc)lc.textContent=t.legCp;
+  const lw=document.getElementById('leg-warn');if(lw)lw.textContent=t.legWarn;
+  const lo=document.getElementById('leg-over');if(lo)lo.textContent=t.legOver;
+  const ld=document.getElementById('leg-done');if(ld)ld.textContent=t.legDone;
+  const lb=document.getElementById('leg-bl');if(lb)lb.textContent=t.legBl;
+  // Modal labels
+  const mty=document.getElementById('lbl-type');if(mty)mty.textContent=t.modalType;
+  const tg=document.getElementById('lbl-tp-goal');if(tg)tg.textContent=t.tpGoal;
+  const tpr=document.getElementById('lbl-tp-project');if(tpr)tpr.textContent=t.tpProject;
+  const ttask=document.getElementById('lbl-tp-task');if(ttask)ttask.textContent=t.tpTask;
+  const tms=document.getElementById('lbl-tp-milestone');if(tms)tms.textContent=t.tpMilestone;
+  const mn=document.getElementById('lbl-name');if(mn)mn.textContent=t.name;
+  const ma=document.getElementById('lbl-assignee');if(ma)ma.textContent=t.assignee;
+  const msd=document.getElementById('lbl-start');if(msd)msd.textContent=t.startDate;
+  const med=document.getElementById('lbl-end');if(med)med.textContent=t.endDate;
+  const mdr=document.getElementById('lbl-dur');if(mdr)mdr.textContent=t.dur;
+  const mpg=document.getElementById('lbl-prog');if(mpg){const pv=document.getElementById('pv');mpg.innerHTML=t.prog.replace('%',` <span id="pv">${pv?pv.textContent:'0'}</span>%`);}
+  const mdep=document.getElementById('lbl-deps');if(mdep)mdep.textContent=t.deps;
+  const mca=document.getElementById('lbl-modal-cancel');if(mca)mca.textContent=t.cancel;
+  const msv=document.getElementById('lbl-modal-save');if(msv)msv.textContent=t.save;
+  // Member modal labels
+  const mmn=document.getElementById('lbl-mm-name');if(mmn)mmn.textContent=t.mmName;
+  const mml=document.getElementById('lbl-mm-line');if(mml)mml.textContent=t.mmLine;
+  const mmca=document.getElementById('lbl-mm-cancel');if(mmca)mmca.textContent=t.cancel;
+  const mmsv=document.getElementById('lbl-mm-save');if(mmsv)mmsv.textContent=t.save;
+  // Re-render dynamic content if pages are visible
+  if(typeof render==='function')render();
+  const cp3=document.getElementById('page-stats');
+  if(cp3&&cp3.style.display!=='none'&&typeof renderStatsPage==='function')renderStatsPage();
+  const tp=document.getElementById('page-team');
+  if(tp&&tp.style.display!=='none'&&typeof renderTeamPage==='function')renderTeamPage();
+  const op=document.getElementById('page-overdue');
+  if(op&&op.style.display!=='none'&&typeof renderOverduePage==='function')renderOverduePage();
+}
+function toggleLang(){setLang(lang==='zh'?'en':'zh');}
+
 // ── Constants ─────────────────────────────────────────────────────────
 const COLORS=['#3b82f6','#8b5cf6','#ec4899','#f97316','#14b8a6','#64748b','#f43f5e','#0ea5e9','#10b981','#a855f7'];
 const AVATAR_COLORS=['#3b82f6','#8b5cf6','#ec4899','#f97316','#14b8a6','#f43f5e','#0ea5e9','#10b981','#a855f7','#64748b'];
@@ -614,7 +880,7 @@ function renderBody(mn,mx,px,W){
       hitArea.addEventListener('mouseenter',e=>{arrow.setAttribute('stroke','#dc2626');arrow.setAttribute('stroke-width','2.5');arrow.setAttribute('marker-end','url(#arr-red)');hideTT();const tt=document.getElementById('tt');tt.innerHTML='點擊刪除此相依關係';tt.style.display='block';moveTT(e);});
       hitArea.addEventListener('mousemove',moveTT);
       hitArea.addEventListener('mouseleave',()=>{arrow.setAttribute('stroke',normalCol);arrow.setAttribute('stroke-width','1.5');arrow.setAttribute('marker-end',mk);hideTT();});
-      hitArea.addEventListener('click',e=>{e.stopPropagation();t.deps=t.deps.filter(d=>d!==did);hideTT();render();saveData();flash(`已移除相依：${dep.name} → ${t.name}`);});
+      hitArea.addEventListener('click',e=>{e.stopPropagation();t.deps=t.deps.filter(d=>d!==did);hideTT();render();saveData();flash(T[lang].flashDepRemoved(dep.name,t.name));});
       svg.appendChild(hitArea);
     });
   });
@@ -668,7 +934,7 @@ function render(){
 }
 
 function statusPill(st){
-  const map={done:['ts-done','已完成'],over:['ts-over','逾期'],warn:['ts-warn','即將到期'],ahead:['ts-ahead','超前'],ok:['ts-ok','如期']};
+  const map={done:['ts-done',T[lang].stDone],over:['ts-over',T[lang].stOver],warn:['ts-warn',T[lang].stWarn],ahead:['ts-ahead',T[lang].stAhead],ok:['ts-ok',T[lang].stOk]};
   const[cls,lbl]=map[st]||map.ok;
   return`<span class="tstatus ${cls}">${lbl}</span>`;
 }
@@ -713,7 +979,7 @@ function doListDrop(srcId,tgtId,pos){
     tasks.splice(ins,0,...grp);
   }
   listDrag=null;
-  render();saveData();flash('✓ 已移動');
+  render();saveData();flash(T[lang].flashMoved);
 }
 function renderTaskList(){
   const{crit}=cpm();const rows=getVisibleRows();
@@ -776,24 +1042,24 @@ function renderStatusBar(){
   const done=leaves.filter(t=>t.prog>=100).length;
   const wn=leaves.filter(t=>{const s=status(t);return s==='warn'||s==='over';}).length;
   const projCount=tasks.filter(t=>t.type==='project').length;
-  document.getElementById('st0').textContent=`${projCount} 個專案 / ${leaves.length} 個任務`;
-  document.getElementById('st1').textContent=`完成 ${done}`;
-  document.getElementById('st2').textContent=`關鍵路徑 ${crit.size} 個`;
-  document.getElementById('st3').textContent=`${parseInt(document.getElementById('wdays').value)||3}天內到期 ${wn} 個`;
+  document.getElementById('st0').textContent=T[lang].stbarProjects(projCount,leaves.length);
+  document.getElementById('st1').textContent=T[lang].stbarDone(done);
+  document.getElementById('st2').textContent=T[lang].stbarCp(crit.size);
+  document.getElementById('st3').textContent=T[lang].stbarWarn(parseInt(document.getElementById('wdays').value)||3,wn);
 }
 
 function toggleCollapse(id){if(collapsed.has(id))collapsed.delete(id);else collapsed.add(id);render();}
 
 // ── Snapshot helpers ─────────────────────────────────────────────────
 function getISOWeek(d){const dt=new Date(d.getTime());dt.setHours(0,0,0,0);dt.setDate(dt.getDate()+3-(dt.getDay()+6)%7);const w1=new Date(dt.getFullYear(),0,4);return{week:1+Math.round(((dt-w1)/86400000-3+(w1.getDay()+6)%7)/7),year:dt.getFullYear()};}
-function deltaBadge(d){if(d===null||d===undefined)return'';if(d>0)return`<span style="color:#10b981;font-size:11px;font-weight:700;margin-left:5px">↑ +${d}%</span>`;if(d<0)return`<span style="color:#ef4444;font-size:11px;font-weight:700;margin-left:5px">↓ ${d}%</span>`;return`<span style="color:#94a3b8;font-size:11px;margin-left:5px">→ 持平</span>`;}
+function deltaBadge(d){if(d===null||d===undefined)return'';if(d>0)return`<span style="color:#10b981;font-size:11px;font-weight:700;margin-left:5px">↑ +${d}%</span>`;if(d<0)return`<span style="color:#ef4444;font-size:11px;font-weight:700;margin-left:5px">↓ ${d}%</span>`;return`<span style="color:#94a3b8;font-size:11px;margin-left:5px">${T[lang].statFlat}</span>`;}
 function takeWeekSnapshot(verbose=true){
   const{week,year}=getISOWeek(tod());
   weekSnapshot={date:fmtD(tod()),week,year,projects:{},tasks:{}};
   tasks.filter(t=>t.type==='project').forEach(p=>{weekSnapshot.projects[p.id]=getProjectProgress(p.id);});
   tasks.filter(isLeaf).forEach(t=>{weekSnapshot.tasks[t.id]=t.prog;});
   saveData();
-  if(verbose){flash('本周進度基準已記錄 ✓');if(currentPage==='stats')renderStatsPage();}
+  if(verbose){flash(T[lang].flashSnap);if(currentPage==='stats')renderStatsPage();}
 }
 
 // ── Stats page ────────────────────────────────────────────────────────
@@ -825,18 +1091,18 @@ function renderStatsPage(){
 
   let html=`
   <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-radius:10px;padding:12px 18px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:20px">
-    <div style="font-size:13px;color:var(--text2)">📸 對比基準：<b style="color:var(--text)">${weekSnapshot?weekSnapshot.date+'（第 '+weekSnapshot.week+' 週）':'尚未設定，點右側按鈕建立第一筆基準'}</b></div>
-    <button class="btn" onclick="takeWeekSnapshot()" style="flex-shrink:0">📸 記錄本周基準</button>
+    <div style="font-size:13px;color:var(--text2)">📸 <b style="color:var(--text)">${weekSnapshot?T[lang].snapshotLabel(weekSnapshot.date,weekSnapshot.week):T[lang].snapshotNone}</b></div>
+    <button class="btn" onclick="takeWeekSnapshot()" style="flex-shrink:0">${T[lang].recordSnapshot}</button>
   </div>
   <div class="stats-section-title">總覽</div>
   <div class="stats-cards">
-    <div class="stat-card"><div class="stat-card-val" style="color:var(--primary)">${tasks.filter(t=>t.type==='project').length}</div><div class="stat-card-lbl">進行中專案</div></div>
-    <div class="stat-card"><div class="stat-card-val" style="color:var(--text)">${leaves.length}</div><div class="stat-card-lbl">總任務數</div></div>
-    <div class="stat-card"><div class="stat-card-val" style="color:var(--success)">${overallPct}%</div><div class="stat-card-lbl">整體完成度</div></div>
-    <div class="stat-card"><div class="stat-card-val" style="color:var(--success)">${done}</div><div class="stat-card-lbl">已完成任務</div></div>
-    <div class="stat-card"><div class="stat-card-val" style="color:var(--primary)">${inProg}</div><div class="stat-card-lbl">進行中任務</div></div>
-    <div class="stat-card"><div class="stat-card-val" style="color:var(--critical)">${overdue}</div><div class="stat-card-lbl">逾期任務</div></div>
-    <div class="stat-card"><div class="stat-card-val" style="color:#0d9488">${ahead}</div><div class="stat-card-lbl">超前進度任務</div></div>
+    <div class="stat-card"><div class="stat-card-val" style="color:var(--primary)">${tasks.filter(t=>t.type==='project').length}</div><div class="stat-card-lbl">${T[lang].scActiveProj}</div></div>
+    <div class="stat-card"><div class="stat-card-val" style="color:var(--text)">${leaves.length}</div><div class="stat-card-lbl">${T[lang].scTotalTask}</div></div>
+    <div class="stat-card"><div class="stat-card-val" style="color:var(--success)">${overallPct}%</div><div class="stat-card-lbl">${T[lang].scOverallPct}</div></div>
+    <div class="stat-card"><div class="stat-card-val" style="color:var(--success)">${done}</div><div class="stat-card-lbl">${T[lang].scDone}</div></div>
+    <div class="stat-card"><div class="stat-card-val" style="color:var(--primary)">${inProg}</div><div class="stat-card-lbl">${T[lang].scInProg}</div></div>
+    <div class="stat-card"><div class="stat-card-val" style="color:var(--critical)">${overdue}</div><div class="stat-card-lbl">${T[lang].scOverdue}</div></div>
+    <div class="stat-card"><div class="stat-card-val" style="color:#0d9488">${ahead}</div><div class="stat-card-lbl">${T[lang].scAhead}</div></div>
   </div>
 
   <div class="stats-section-title">個人進度</div>
@@ -867,12 +1133,12 @@ function renderStatsPage(){
       <div class="prog-label"><span>整體進度</span><span style="font-weight:700;color:var(--text)">${pct}%${deltaBadge(personDelta)}</span></div>
       <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
       <div class="task-pills">
-        ${pdone?`<span class="pill done">✓ 完成 ${pdone}</span>`:''}
-        ${pprog?`<span class="pill prog">▶ 進行中 ${pprog}</span>`:''}
-        ${pahead?`<span class="pill ahead">⚡ 超前進度 ${pahead}</span>`:''}
-        ${pwarn?`<span class="pill warn">⏰ 即將到期 ${pwarn}</span>`:''}
-        ${pover?`<span class="pill over">⚠ 逾期 ${pover}</span>`:''}
-        ${(!pdone&&!pprog&&!pahead&&!pwarn&&!pover)?`<span class="pill prog">尚無任務</span>`:''}
+        ${pdone?`<span class="pill done">${T[lang].pillDone(pdone)}</span>`:''}
+        ${pprog?`<span class="pill prog">${T[lang].pillProg(pprog)}</span>`:''}
+        ${pahead?`<span class="pill ahead">${T[lang].pillAhead(pahead)}</span>`:''}
+        ${pwarn?`<span class="pill warn">${T[lang].pillWarn(pwarn)}</span>`:''}
+        ${pover?`<span class="pill over">${T[lang].pillOver(pover)}</span>`:''}
+        ${(!pdone&&!pprog&&!pahead&&!pwarn&&!pover)?`<span class="pill prog">${T[lang].pillNoTask}</span>`:''}
       </div>
       <div class="person-tasks">`;
 
@@ -881,14 +1147,14 @@ function renderStatsPage(){
       const dotColor={done:'#10b981',over:'#ef4444',warn:'#f59e0b',ahead:'#0d9488',ok:'#3b82f6'}[st];
       html+=`<div class="ptask"><span class="ptask-dot" style="background:${dotColor}"></span><span class="ptask-name">${t.ms?'◆ ':''}${t.name}</span><span class="ptask-pct">${t.prog}%</span></div>`;
     });
-    if(ptasks.length>6)html+=`<div style="font-size:11px;color:var(--text2);margin-top:2px">… 另 ${ptasks.length-6} 個任務</div>`;
+    if(ptasks.length>6)html+=`<div style="font-size:11px;color:var(--text2);margin-top:2px">${T[lang].moreTask(ptasks.length-6)}</div>`;
 
     html+=`</div></div>`;
   });
 
   html+=`</div>
   <div style="margin-top:8px">
-  <div class="stats-section-title">專案進度</div>
+  <div class="stats-section-title">${T[lang].projProgress}</div>
   <div style="display:flex;flex-direction:column;gap:10px">`;
 
   projects.forEach(proj=>{
@@ -910,10 +1176,10 @@ function renderStatsPage(){
       <div style="font-size:11px;color:var(--text2);width:60px;flex-shrink:0">👤 ${assigneeName}</div>
       <div class="proj-stat-bar-wrap"><div class="proj-stat-bar" style="width:${pct}%;background:${barColor}"></div></div>
       <div class="proj-stat-pct" style="color:${barColor};display:flex;align-items:center;gap:2px">${pct}%${deltaBadge(projDelta)}</div>
-      <div class="proj-stat-count" style="font-size:11px;color:var(--text2)">${leaves2.filter(t=>t.prog>=100).length}/${leaves2.length} 完成</div>
-      ${pover2?`<span class="pill over" style="font-size:11px">⚠ 逾期 ${pover2}</span>`:''}
-      ${!pover2&&pwarn2?`<span class="pill warn" style="font-size:11px">⏰ 即將到期 ${pwarn2}</span>`:''}
-      ${!pover2&&!pwarn2&&pahead2?`<span class="pill ahead" style="font-size:11px">⚡ 超前進度 ${pahead2}</span>`:''}
+      <div class="proj-stat-count" style="font-size:11px;color:var(--text2)">${T[lang].projDone(leaves2.filter(t=>t.prog>=100).length,leaves2.length)}</div>
+      ${pover2?`<span class="pill over" style="font-size:11px">${T[lang].pillOver(pover2)}</span>`:''}
+      ${!pover2&&pwarn2?`<span class="pill warn" style="font-size:11px">${T[lang].pillWarn(pwarn2)}</span>`:''}
+      ${!pover2&&!pwarn2&&pahead2?`<span class="pill ahead" style="font-size:11px">${T[lang].pillAhead(pahead2)}</span>`:''}
       ${b?`<div style="font-size:11px;color:var(--text2);white-space:nowrap">${fmtD(b.start)} ～ ${fmtD(b.end)}</div>`:''}
     </div>`;
   });
@@ -956,7 +1222,7 @@ function renderStatsPage(){
           </div>
         </div>
       </div>
-      ${unfinished.length?`<div class="workload-chips">${unfinished.map(({t,remain,st})=>`<span class="wchip"><span style="width:8px;height:8px;border-radius:50%;background:${dotCol[st]||'#3b82f6'};flex-shrink:0;display:inline-block"></span>${t.name}<b style="color:var(--text2);margin-left:2px">≈${remain}d</b></span>`).join('')}</div>`:'<div style="font-size:12px;color:var(--success);margin-top:4px">✓ 所有任務已完成</div>'}
+      ${unfinished.length?`<div class="workload-chips">${unfinished.map(({t,remain,st})=>`<span class="wchip"><span style="width:8px;height:8px;border-radius:50%;background:${dotCol[st]||'#3b82f6'};flex-shrink:0;display:inline-block"></span>${t.name}<b style="color:var(--text2);margin-left:2px">≈${remain}d</b></span>`).join('')}</div>`:`<div style="font-size:12px;color:var(--success);margin-top:4px">${T[lang].allDone}</div>`}
     </div>`;
   });
 
@@ -968,7 +1234,7 @@ function renderStatsPage(){
 // ── Team management ───────────────────────────────────────────────────
 function renderTeamPage(){
   const grid=document.getElementById('team-grid');
-  if(!team.length){grid.innerHTML=`<div style="color:var(--text2);font-size:13px;grid-column:1/-1">尚無成員，請點擊右上角「＋ 新增成員」。</div>`;return;}
+  if(!team.length){grid.innerHTML=`<div style="color:var(--text2);font-size:13px;grid-column:1/-1">${T[lang].noMembers}</div>`;return;}
   grid.innerHTML=team.map(m=>{
     const col=AVATAR_COLORS[(m.id-1)%AVATAR_COLORS.length];
     const ini=m.name.slice(0,1);
@@ -987,7 +1253,7 @@ function renderTeamPage(){
   }).join('');
 }
 function openAddMember(){
-  document.getElementById('mm-title').textContent='新增成員';
+  document.getElementById('mm-title').textContent=T[lang].mmTitleAdd;
   document.getElementById('mm-eid').value='';
   document.getElementById('mm-name').value='';
   document.getElementById('mm-email').value='';
@@ -997,7 +1263,7 @@ function openAddMember(){
 }
 function openEditMember(id){
   const m=team.find(x=>x.id===id);if(!m)return;
-  document.getElementById('mm-title').textContent='編輯成員';
+  document.getElementById('mm-title').textContent=T[lang].mmTitleEdit;
   document.getElementById('mm-eid').value=id;
   document.getElementById('mm-name').value=m.name;
   document.getElementById('mm-email').value=m.email;
@@ -1008,7 +1274,7 @@ function openEditMember(id){
 function closeMemberModal(){document.getElementById('member-modal').style.display='none';}
 function saveMember(){
   const name=document.getElementById('mm-name').value.trim();
-  if(!name){flash('請填寫姓名');return;}
+  if(!name){flash(T[lang].noMemberName);return;}
   const email=document.getElementById('mm-email').value.trim();
   const line=document.getElementById('mm-line').value.trim();
   const eid=parseInt(document.getElementById('mm-eid').value);
@@ -1023,14 +1289,14 @@ function saveMember(){
 }
 function deleteMember(id){
   const m=team.find(x=>x.id===id);if(!m)return;
-  if(!confirm(`確定刪除「${m.name}」？`))return;
+  if(!confirm(T[lang].confirmDeleteMember(m.name)))return;
   team=team.filter(x=>x.id!==id);
   if(filterAssignee===m.name){filterAssignee='';const s=document.getElementById('filter-sel');if(s)s.value='';}
   renderTeamPage();updateFilterDropdown();saveData();
 }
 function populateAssigneeSelect(currentVal){
   const sel=document.getElementById('fassignee');
-  sel.innerHTML=`<option value="">— 請選擇負責人 —</option>`+
+  sel.innerHTML=`<option value="">${T[lang].selectAssignee}</option>`+
     team.map(m=>`<option value="${m.name}"${m.name===currentVal?' selected':''}>${m.name}${m.line?' （'+m.line+'）':''}</option>`).join('');
 }
 
@@ -1059,7 +1325,7 @@ function renderOverduePage(){
   const groups={};
   overdueTasks.forEach(t=>{
     const proj=tasks.find(p=>p.id===t.parentId&&p.type==='project');
-    const aName=proj?.assignee||'未指定負責人';
+    const aName=proj?.assignee||T[lang].noAssignee;
     const member=team.find(m=>m.name===aName);
     const email=member?.email||'';
     if(!groups[aName])groups[aName]={name:aName,email,color:AVATAR_COLORS[Object.keys(groups).length%AVATAR_COLORS.length],items:[]};
@@ -1075,31 +1341,28 @@ function renderOverduePage(){
 
   let html='';
   if(!total){
-    html=`<div class="overdue-empty">✅ 目前無逾期任務，所有專案如期進行</div>`;
+    html=`<div class="overdue-empty">${T[lang].overdueEmpty}</div>`;
   } else {
     html+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-      <div class="stats-section-title" style="margin-bottom:0;color:var(--critical)">⚠ 逾期任務 — 共 ${total} 個，影響 ${list.length} 位成員</div>
+      <div class="stats-section-title" style="margin-bottom:0;color:var(--critical)">${T[lang].overdueTitle(total,list.length)}</div>
     </div>`;
     list.forEach(g=>{
       const ini=g.name.slice(0,1);
       const totalLate=g.items.reduce((s,i)=>s+i.daysLate,0);
       // Build mailto
-      const subject=encodeURIComponent(`【進度提醒】您有 ${g.items.length} 個任務已逾期，請更新進度`);
+      const subject=encodeURIComponent(T[lang].emailSubject(g.items.length));
       const bodyLines=[
-        `${g.name} 您好，`,
+        T[lang].emailLine1(g.name),
         ``,
-        `以下任務已超過預定完成日期，請儘快更新進度或提出 Catch-up Plan：`,
+        T[lang].emailLine2,
         ``,
         ...g.items.map(({task:t,proj,end,daysLate})=>
-          `・${proj?`[${proj.name}] `:''}${t.name}\n  原定完成：${fmtD(end)}（已逾期 ${daysLate} 天）\n  目前進度：${t.prog}%`
+          T[lang].emailItem(proj?.name,t.name,fmtD(end),daysLate,t.prog)
         ),
         ``,
-        `請於 3 個工作天內回覆此郵件，告知：`,
-        `1. 目前最新進度`,
-        `2. 預計完成日期`,
-        `3. 如有延誤原因或需要支援，請一併說明`,
-        ``,
-        `謝謝您的配合。`,
+        T[lang].emailQ1,
+        T[lang].emailQ2,
+        T[lang].emailQ3,
       ];
       const body=encodeURIComponent(bodyLines.join('\n'));
       const mailto=`mailto:${g.email}?subject=${subject}&body=${body}`;
@@ -1109,10 +1372,11 @@ function renderOverduePage(){
           <div class="avatar" style="background:${g.color};width:42px;height:42px;font-size:17px;flex-shrink:0">${ini}</div>
           <div class="overdue-card-info">
             <div class="overdue-card-name">${g.name}</div>
-            <div class="overdue-card-email">${g.email||'尚未設定 Email — 請至團隊頁面補填'}</div>
+            <div class="overdue-card-email">${g.email||T[lang].emailNone}</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
-            <a href="${mailto}" class="send-btn${reminderLog[g.name]&&(new Date()-new Date(reminderLog[g.name]))<86400000?' sent':''}" onclick="recordReminder(${JSON.stringify(g.name)})" ${!g.email?'style="opacity:.4;pointer-events:none"title="請先至團隊頁面設定此人的 Email"':''}>
+            <a href="${mailto}" class="send-btn${reminderLog[g.name]&&(new Date()-new Date(reminderLog[g.name]))<86400000?' sent':''}" onclick="recordReminder(${JSON.stringify(g.name)})" ${!g.email?`style="opacity:.4;pointer-events:none"title="${T[lang].emailNoTitle}"`:''}>
+
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
               ${reminderLog[g.name]&&(new Date()-new Date(reminderLog[g.name]))<86400000?'再次發送':'發送提醒'}
             </a>
@@ -1124,9 +1388,9 @@ function renderOverduePage(){
       g.items.sort((a,b)=>b.daysLate-a.daysLate).forEach(({task:t,proj,end,daysLate})=>{
         html+=`<div class="overdue-task-row">
           <span class="overdue-task-name">${proj?`<span style="color:${proj.color};font-size:11px;font-weight:700;margin-right:4px">[${proj.name}]</span>`:''}${t.name}</span>
-          <span class="overdue-task-meta">原定 ${fmtD(end)}</span>
-          <span class="days-late">逾期 ${daysLate} 天</span>
-          <span class="prog-inline">進度 ${t.prog}%</span>
+          <span class="overdue-task-meta">${T[lang].origDate(fmtD(end))}</span>
+          <span class="days-late">${T[lang].daysLate(daysLate)}</span>
+          <span class="prog-inline">${T[lang].progLabel(t.prog)}</span>
         </div>`;
       });
 
@@ -1154,9 +1418,9 @@ function showPage(page){
 // ── Tooltip ───────────────────────────────────────────────────────────
 function showTT(e,t,isCrit){
   if(drag)return;const tt=document.getElementById('tt');
-  if(t.type==='goal'){const b=getProjectBounds(t.id);const prog=getProjectProgress(t.id);const st=status(t);const lbl={done:'✅ 已完成',over:'⚠️ 有任務逾期',warn:'⏰ 有任務即將到期',ok:'📋 進行中'}[st]||'📋 進行中';tt.innerHTML=`<b style="font-size:13px">🎯 ${t.name}</b><br>${b?`期間：${fmtD(b.start)} ～ ${fmtD(b.end)}<br>總工期：${b.dur} 天<br>`:''}整體進度：${prog}%<br>專案數：${getChildren(t.id).length}<br>${lbl}`;}
-  else if(t.type==='project'){const b=getProjectBounds(t.id);const prog=getProjectProgress(t.id);const st=status(t);const lbl={done:'✅ 已完成',over:'⚠️ 有任務逾期',warn:'⏰ 有任務即將到期',ok:'📋 進行中'}[st];tt.innerHTML=`<b style="font-size:13px">📁 ${t.name}</b><br>${b?`期間：${fmtD(b.start)} ～ ${fmtD(b.end)}<br>總工期：${b.dur} 天<br>`:''}整體進度：${prog}%<br>${lbl}`;}
-  else{const end=addDays(parseD(t.start),t.dur);const dl=diff(tod(),end);const st=status(t);const si={done:'✅ 已完成',over:`⚠️ 逾期 ${Math.abs(dl)} 天`,warn:`⏰ 還剩 ${dl} 天`,ok:`📅 還剩 ${dl} 天`}[st];tt.innerHTML=`<b style="font-size:13px">${t.name}</b><br>開始：${t.start}<br>結束：${fmtD(end)}<br>工期：${t.dur} 天<br>進度：${t.prog}%${isCrit&&showCP?'<br><span style="color:#fca5a5">⚡ 關鍵路徑</span>':''}<br>${si}`;}
+  if(t.type==='goal'){const b=getProjectBounds(t.id);const prog=getProjectProgress(t.id);const st=status(t);const lbl={done:T[lang].ttGoalDone,over:T[lang].ttGoalOver,warn:T[lang].ttGoalWarn,ok:T[lang].ttGoalOk}[st]||T[lang].ttGoalOk;tt.innerHTML=`<b style="font-size:13px">🎯 ${t.name}</b><br>${b?`${T[lang].ttPeriod(fmtD(b.start),fmtD(b.end))}<br>${T[lang].ttDur(b.dur)}<br>`:''}${T[lang].ttOvProg(prog)}<br>${T[lang].ttProjCount(getChildren(t.id).length)}<br>${lbl}`;}
+  else if(t.type==='project'){const b=getProjectBounds(t.id);const prog=getProjectProgress(t.id);const st=status(t);const lbl={done:T[lang].ttGoalDone,over:T[lang].ttGoalOver,warn:T[lang].ttGoalWarn,ok:T[lang].ttGoalOk}[st];tt.innerHTML=`<b style="font-size:13px">📁 ${t.name}</b><br>${b?`${T[lang].ttPeriod(fmtD(b.start),fmtD(b.end))}<br>${T[lang].ttDur(b.dur)}<br>`:''}${T[lang].ttOvProg(prog)}<br>${lbl}`;}
+  else{const end=addDays(parseD(t.start),t.dur);const dl=diff(tod(),end);const st=status(t);const si={done:T[lang].ttDone,over:T[lang].ttOver(Math.abs(dl)),warn:T[lang].ttWarn(dl),ok:T[lang].ttOk(dl)}[st];tt.innerHTML=`<b style="font-size:13px">${t.name}</b><br>${T[lang].ttStart(t.start)}<br>${T[lang].ttEnd(fmtD(end))}<br>${T[lang].ttDurTask(t.dur)}<br>${T[lang].ttProg(t.prog)}${isCrit&&showCP?`<br><span style="color:#fca5a5">${T[lang].ttCrit}</span>`:''}<br>${si}`;}
   tt.style.display='block';moveTT(e);
 }
 const moveTT=e=>{if(drag)return;const t=document.getElementById('tt');t.style.left=(e.clientX+16)+'px';t.style.top=(e.clientY-10)+'px';};
@@ -1182,8 +1446,8 @@ function propagateDeps(){
 function snapshotPositions(){return tasks.filter(isLeaf).map(t=>({id:t.id,start:t.start,dur:t.dur}));}
 function restorePositions(snap){snap.forEach(o=>{const t=tasks.find(x=>x.id===o.id);if(t){t.start=o.start;t.dur=o.dur;}});}
 
-function startMove(e,task){if(e.button!==0)return;e.preventDefault();e.stopPropagation();hideTT();const{mn}=dateRange();const px=PX[view];drag={type:'move',taskId:task.id,startX:e.clientX,origStart:task.start,origDur:task.dur,snap:snapshotPositions(),mn,px};document.body.classList.add('dragging');showHint('拖動中：'+task.name);}
-function startResize(e,task){if(e.button!==0)return;e.preventDefault();e.stopPropagation();hideTT();const{mn}=dateRange();const px=PX[view];drag={type:'resize',taskId:task.id,startX:e.clientX,origStart:task.start,origDur:task.dur,snap:snapshotPositions(),mn,px};document.body.classList.add('dragging');showHint('調整工期：'+task.name);}
+function startMove(e,task){if(e.button!==0)return;e.preventDefault();e.stopPropagation();hideTT();const{mn}=dateRange();const px=PX[view];drag={type:'move',taskId:task.id,startX:e.clientX,origStart:task.start,origDur:task.dur,snap:snapshotPositions(),mn,px};document.body.classList.add('dragging');showHint(T[lang].hintMove(task.name));}
+function startResize(e,task){if(e.button!==0)return;e.preventDefault();e.stopPropagation();hideTT();const{mn}=dateRange();const px=PX[view];drag={type:'resize',taskId:task.id,startX:e.clientX,origStart:task.start,origDur:task.dur,snap:snapshotPositions(),mn,px};document.body.classList.add('dragging');showHint(T[lang].hintResize(task.name));}
 function startConnect(e,task,rowIdx){if(e.button!==0)return;e.preventDefault();e.stopPropagation();hideTT();const{mn}=dateRange();const px=PX[view];const fx=toX(addDays(parseD(task.start),task.dur),mn,px)+1,fy=rowIdx*RH+RH/2;drag={type:'connect',fromId:task.id,fromX:fx,fromY:fy,mn,px};document.body.classList.add('connecting');const svg=document.getElementById('gsvg');svg.appendChild(el('line',{id:'tmp-arr',x1:fx,y1:fy,x2:fx,y2:fy,stroke:'#3b82f6','stroke-width':'2.5','stroke-dasharray':'6,3','marker-end':'url(#arr-blue)',opacity:'0.85'}));showHint('拖至目標任務建立相依');}
 
 document.addEventListener('mousemove',e=>{
@@ -1207,7 +1471,7 @@ document.addEventListener('mouseup',e=>{
     document.getElementById('tmp-arr')?.remove();
     const c=getSVGCoords(e);const rows=getVisibleRows();const idx=Math.floor(c.y/RH);
     const target=rows[idx]?.task;
-    if(target&&isLeaf(target)&&target.id!==drag.fromId&&!target.deps.includes(drag.fromId)){if(!wouldCycle(target.id,drag.fromId))target.deps.push(drag.fromId);else flash('⚠️ 無法建立：會造成循環相依');}
+    if(target&&isLeaf(target)&&target.id!==drag.fromId&&!target.deps.includes(drag.fromId)){if(!wouldCycle(target.id,drag.fromId))target.deps.push(drag.fromId);else flash(T[lang].flashCycle);}
     render();saveData();
   } else {renderTaskList();renderStatusBar();saveData();}
   drag=null;document.body.classList.remove('dragging','connecting');
@@ -1219,7 +1483,7 @@ function wouldCycle(targetId,fromId){const vis=new Set();function walk(id){if(vi
 function setView(v){view=v;['day','week','month'].forEach(m=>document.getElementById('v'+m[0]).classList.toggle('act',m===v));render();}
 function toggleCP(){showCP=!showCP;document.getElementById('btn-cp').classList.toggle('act',showCP);render();}
 function toggleBL(){showBL=!showBL;document.getElementById('btn-bl').classList.toggle('act',showBL);render();}
-function saveBaseline(){tasks.filter(isLeaf).forEach(t=>{t.bl={start:t.start,dur:t.dur};});showBL=true;document.getElementById('btn-bl').classList.add('act');render();flash('基準線已儲存 ✓');saveData();}
+function saveBaseline(){tasks.filter(isLeaf).forEach(t=>{t.bl={start:t.start,dur:t.dur};});showBL=true;document.getElementById('btn-bl').classList.add('act');render();flash(T[lang].flashSavedBl);saveData();}
 
 // ── Modal ──────────────────────────────────────────────────────────────
 function syncEnd(){const s=document.getElementById('fs').value,d=parseInt(document.getElementById('fd').value)||1;if(s)document.getElementById('fe').value=fmtD(addDays(parseD(s),d));}
@@ -1231,21 +1495,21 @@ function setModalType(type){
   document.getElementById('assignee-field').style.display=type==='project'?'':'none';
   document.getElementById('fparent-row').style.display=type==='goal'?'none':'';
   const lbl=document.getElementById('fparent-label');
-  if(lbl)lbl.textContent=type==='project'?'所屬目標':'父層專案';
+  if(lbl)lbl.textContent=type==='project'?T[lang].parentGoalLabel:T[lang].parentLabel;
   buildParentDropdown(document.getElementById('eid').value?parseInt(document.getElementById('eid').value):null);
 }
 function buildParentDropdown(excludeId){
   const sel=document.getElementById('fparent');
   if(modalType==='project'){
-    sel.innerHTML='<option value="">（獨立專案，無目標）</option>';
+    sel.innerHTML=`<option value="">${T[lang].parentNone}</option>`;
     tasks.filter(t=>t.type==='goal'&&t.id!==excludeId).forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent='🎯 '+t.name;sel.appendChild(o);});
   } else {
-    sel.innerHTML='<option value="">（頂層，無父層）</option>';
+    sel.innerHTML=`<option value="">${T[lang].parentNoneTask}</option>`;
     tasks.filter(t=>t.type==='project'&&t.id!==excludeId).forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.name;sel.appendChild(o);});
   }
 }
 function openAdd(parentId=null,type='task'){
-  document.getElementById('mttl').textContent='新增';document.getElementById('eid').value='';document.getElementById('fn').value='';
+  document.getElementById('mttl').textContent=T[lang].modalTitleAdd;document.getElementById('eid').value='';document.getElementById('fn').value='';
   const t=tod();document.getElementById('fs').value=fmtD(t);document.getElementById('fd').value='5';document.getElementById('fe').value=fmtD(addDays(t,5));
   document.getElementById('fp').value='0';document.getElementById('pv').textContent='0';document.getElementById('fdeps').value='';
   populateAssigneeSelect('');
@@ -1255,7 +1519,7 @@ function openAdd(parentId=null,type='task'){
 }
 function openEdit(id){
   const t=tasks.find(x=>x.id===id);if(!t)return;
-  document.getElementById('mttl').textContent='編輯';document.getElementById('eid').value=id;document.getElementById('fn').value=t.name;
+  document.getElementById('mttl').textContent=T[lang].modalTitleEdit;document.getElementById('eid').value=id;document.getElementById('fn').value=t.name;
   populateAssigneeSelect(t.assignee||'');
   setModalType(t.type==='goal'?'goal':t.ms?'milestone':t.type);pickColor(t.color);
   document.getElementById('fparent').value=t.parentId||'';
@@ -1264,7 +1528,7 @@ function openEdit(id){
 }
 function closeModal(){document.getElementById('modal').style.display='none';}
 function saveTask(){
-  const name=document.getElementById('fn').value.trim();if(!name){alert('請輸入名稱');return;}
+  const name=document.getElementById('fn').value.trim();if(!name){alert(T[lang].noName);return;}
   const id=document.getElementById('eid').value;
   const rawParent=document.getElementById('fparent').value;const parentId=rawParent?parseInt(rawParent):null;
   const color=document.querySelector('.csw.sel')?.dataset.c||COLORS[0];
@@ -1282,7 +1546,7 @@ function saveTask(){
 function delTask(id){
   const t=tasks.find(x=>x.id===id);if(!t)return;
   const children=getChildren(id);const desc=getLeafDescendants(id);
-  const msg=children.length?`確定刪除「${t.name}」及所有子項目（共 ${children.length} 個）？`:`確定刪除「${t.name}」？`;
+  const msg=T[lang].confirmDeleteTask(t.name,children.length);
   if(!confirm(msg))return;
   const del=new Set([id,...children.map(c=>c.id),...desc.map(d=>d.id)]);
   tasks=tasks.filter(t=>!del.has(t.id));tasks.forEach(t=>{t.deps=t.deps.filter(d=>!del.has(d));});
@@ -1334,7 +1598,7 @@ function exportData(){
   a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
   a.download=`ganttpro-${fmtD(tod())}.json`;
   a.click();
-  flash('備份已下載 ✓');
+  flash(T[lang].flashBackup);
 }
 function importData(){
   const input=document.createElement('input');
@@ -1347,8 +1611,8 @@ function importData(){
         const d=JSON.parse(ev.target.result);
         if(!Array.isArray(d.tasks))throw new Error();
         tasks=d.tasks;team=d.team||[];nid=d.nid||tasks.reduce((m,t)=>Math.max(m,t.id),0)+1;tmid=d.tmid||team.reduce((m,t)=>Math.max(m,t.id),0)+1;
-        saveData();render();flash('資料匯入成功 ✓');
-      }catch(e){alert('檔案格式錯誤，請選擇由本程式匯出的 JSON 檔');}
+        saveData();render();flash(T[lang].flashImport);
+      }catch(e){alert(T[lang].badFile);}
     };
     reader.readAsText(file);
   };
@@ -1356,7 +1620,7 @@ function importData(){
 }
 
 // ── Init ──────────────────────────────────────────────────────────────
-loadData();if(!weekSnapshot)takeWeekSnapshot(false);buildColorPicker();initScroll();showPage('gantt');updateFilterDropdown();render();setTimeout(scrollToday,150);
+loadData();if(!weekSnapshot)takeWeekSnapshot(false);buildColorPicker();initScroll();showPage('gantt');updateFilterDropdown();render();setTimeout(scrollToday,150);setLang('zh');
 </script>
 </body>
 </html>
